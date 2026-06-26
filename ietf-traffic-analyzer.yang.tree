@@ -6,8 +6,8 @@ module: ietf-traffic-analyzer
        |  +--rw type?     identityref
        |  +--rw filter! {testframe-filter}?
        |     +--rw type      identityref
-       |     +--rw mask?     binary
-       |     +--rw data?     binary
+       |     +--rw mask      binary
+       |     +--rw data      binary
        |     +--rw offset    uint32
        +--rw capture! {capture}?
        |  +--rw max-frames-visible?       uint64
