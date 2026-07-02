@@ -44,7 +44,7 @@ module ietf-traffic-generator {
      This version of this YANG module is part of RFC XXXX; see
      the RFC itself for full legal notices.";
 
-  revision 2026-06-26 {
+  revision 2026-07-02 {
     description
       "Initial revision.";
     reference
@@ -94,19 +94,21 @@ module ietf-traffic-generator {
   identity increment {
     base modifier-action-type;
     description
-      "Indicates increment modifier action.";
+      "Indicates increment modifier action.
+       The operation is performed in network byte order.";
   }
 
   identity decrement {
     base modifier-action-type;
     description
-      "Indicates decrement modifier action.";
+      "Indicates decrement modifier action.
+       The operation is performed in network byte order.";
   }
 
   identity random {
     base modifier-action-type;
     description
-      "Indicates random modifier action.";
+      "Indicates implementation-specific random modifier action.";
   }
 
   grouping common-data {
@@ -186,7 +188,7 @@ module ietf-traffic-generator {
          '../testframe-type' for the corresponding
          dynamic fields or filled with zeros.
 
-         In the case of an Ethernet inteface and static
+         In the case of an Ethernet interface and static
          test frame the correct 4-octet FCS is added to
          the generated frames. The only way to generate
          frames with bad FCS is to specify the data
@@ -202,7 +204,7 @@ module ietf-traffic-generator {
          the closest stream that precedes it that is used.";
     }
     leaf gap {
-      type uint32;
+      type uint64;
       units "octets";
       mandatory true;
       description
@@ -249,7 +251,10 @@ module ietf-traffic-generator {
         key "id";
         description
           "Each modifier specifies the action to be performed
-           on data at a certain offset.";
+           on data at a certain offset.
+
+           Overlapping modifiers have no ordering rules
+           and the behavior will be unspecified.";
         leaf id {
           type uint32;
           description
@@ -305,14 +310,14 @@ module ietf-traffic-generator {
         }
         uses burst-data;
         leaf frames-per-stream {
-          type uint32;
+          type uint64;
           mandatory true;
           description
             "The count of frames to be generated before
              generation of the next stream is started.";
         }
         leaf stream-gap {
-          type uint32;
+          type uint64;
           units "octets";
           mandatory true;
           description
@@ -340,6 +345,7 @@ module ietf-traffic-generator {
           uses modifier-data;
         }
         case multi-stream {
+          if-feature "multi-stream";
           uses multi-stream-data;
         }
       }

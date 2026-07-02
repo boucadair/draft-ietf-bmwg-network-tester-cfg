@@ -7,7 +7,7 @@ module: ietf-traffic-generator
        |  |  +--rw testframe-type?     identityref
        |  |  +--rw frame-size          uint32
        |  |  +--rw frame-data?         binary
-       |  |  +--rw gap                 uint32
+       |  |  +--rw gap                 uint64
        |  |  +--rw burst-gap?          uint32
        |  |  +--rw frames-per-burst?   uint32
        |  |  +--rw modifiers
@@ -17,18 +17,18 @@ module: ietf-traffic-generator
        |  |        +--rw offset         uint32
        |  |        +--rw mask           binary
        |  |        +--rw repetitions    uint32
-       |  +--:(multi-stream)
+       |  +--:(multi-stream) {multi-stream}?
        |     +--rw streams
        |        +--rw stream* [id]
        |           +--rw id                   uint32
        |           +--rw testframe-type?      identityref
        |           +--rw frame-size           uint32
        |           +--rw frame-data?          binary
-       |           +--rw gap                  uint32
+       |           +--rw gap                  uint64
        |           +--rw burst-gap?           uint32
        |           +--rw frames-per-burst?    uint32
-       |           +--rw frames-per-stream    uint32
-       |           +--rw stream-gap           uint32
+       |           +--rw frames-per-stream    uint64
+       |           +--rw stream-gap           uint64
        |           +--rw modifiers
        |              +--rw modifier* [id]
        |                 +--rw id             uint32
