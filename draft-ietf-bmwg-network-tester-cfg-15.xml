@@ -9,9 +9,9 @@
 <?rfc iprnotified="no"?>
 <?rfc strict="yes"?>
 <rfc ipr="trust200902"   category="std"
-     docName="draft-ietf-bmwg-network-tester-cfg-16" >
+     docName="draft-ietf-bmwg-network-tester-cfg-15" >
     <front>
-    <title abbrev="NETWORK-TESTER-MANAGEMENT-16">A YANG Data Model for Network Tester Management</title>
+    <title abbrev="NETWORK-TESTER-MANAGEMENT-15">A YANG Data Model for Network Tester Management</title>
     <author initials="V" surname="Vassilev" fullname='Vladimir Vassilev' >
       <organization>Lightside Instruments AS</organization>
       <address>
@@ -36,9 +36,6 @@ Such a mechanism should allow the control and monitoring of the data plane traff
 
 This document defines a YANG <xref target="RFC7950"/> data model which is composed of two YANG modules for test traffic generator and analyzer functions.
     </t>
-    <t>
-   These modules are intended for use for managing network interconnect testing setups in a laboratory-isolated environment.
-    </t>         
 <section anchor="problem" title="Problem Statement">
     <t>
 Network interconnect tests require active network
@@ -149,7 +146,7 @@ While the data model is designed to be independent of the underlying interface t
   </t>
 <section title="Ethernet Interfaces of Type ianaift:ethernetCsmacd">
   <t>
-The mapping and constraints specification for Ethernet interfaces with /if:interfaces/if:interface/if:type identity equal to ianaift:ethernetCsmacd is part of the module description statements.
+The mapping and constraints specification for Ethernet interfaces with /if:interfaces/if:interface/if:type identity equal to ianaift:ethernetCsmacd is part of the module description statemens.
   </t>
 </section>
 <section title="Other Interfaces">
@@ -180,7 +177,7 @@ module: ietf-traffic-generator
        |  |  +--rw testframe-type?     identityref
        |  |  +--rw frame-size          uint32
        |  |  +--rw frame-data?         binary
-       |  |  +--rw gap                 uint64
+       |  |  +--rw gap                 uint32
        |  |  +--rw burst-gap?          uint32
        |  |  +--rw frames-per-burst?   uint32
        |  |  +--rw modifiers
@@ -190,18 +187,18 @@ module: ietf-traffic-generator
        |  |        +--rw offset         uint32
        |  |        +--rw mask           binary
        |  |        +--rw repetitions    uint32
-       |  +--:(multi-stream) {multi-stream}?
+       |  +--:(multi-stream)
        |     +--rw streams
        |        +--rw stream* [id]
        |           +--rw id                   uint32
        |           +--rw testframe-type?      identityref
        |           +--rw frame-size           uint32
        |           +--rw frame-data?          binary
-       |           +--rw gap                  uint64
+       |           +--rw gap                  uint32
        |           +--rw burst-gap?           uint32
        |           +--rw frames-per-burst?    uint32
-       |           +--rw frames-per-stream    uint64
-       |           +--rw stream-gap           uint64
+       |           +--rw frames-per-stream    uint32
+       |           +--rw stream-gap           uint32
        |           +--rw modifiers
        |              +--rw modifier* [id]
        |                 +--rw id             uint32
@@ -255,7 +252,6 @@ module: ietf-traffic-analyzer
           |  +--ro errors?        yang:counter64
           +--ro testframe-statistics
           |  +--ro pkts?                  yang:counter64
-          |  +--ro octets?                yang:counter64
           |  +--ro sequence-errors?       yang:counter64
           |  +--ro payload-errors?        yang:counter64
           |  +--ro latency
@@ -288,7 +284,7 @@ module: ietf-traffic-analyzer
 This module imports modules defined in <xref target="RFC8343"/> and <xref target="RFC9911"/>.
 The module also references <xref target="IEEE802.3-2014"/> as part of the description statements containing Ethernet interface specific implementation details.
 </t>
-<t>&lt;CODE BEGINS> file "ietf-traffic-generator@2026-07-02.yang"</t>
+<t>&lt;CODE BEGINS> file "ietf-traffic-generator@2026-06-26.yang"</t>
         <figure>
             <artwork><![CDATA[
 module ietf-traffic-generator {
@@ -320,9 +316,6 @@ module ietf-traffic-generator {
      management of the traffic generator functionality part
      of network interconnect testers.
 
-     The module is intended for use in a laboratory-isolated
-     environment.
-
      Copyright (c) 2026 IETF Trust and the persons identified as
      authors of the code.  All rights reserved.
 
@@ -340,7 +333,7 @@ module ietf-traffic-generator {
      This version of this YANG module is part of RFC XXXX; see
      the RFC itself for full legal notices.";
 
-  revision 2026-07-02 {
+  revision 2026-06-26 {
     description
       "Initial revision.";
     reference
@@ -390,21 +383,19 @@ module ietf-traffic-generator {
   identity increment {
     base modifier-action-type;
     description
-      "Indicates increment modifier action.
-       The operation is performed in network byte order.";
+      "Indicates increment modifier action.";
   }
 
   identity decrement {
     base modifier-action-type;
     description
-      "Indicates decrement modifier action.
-       The operation is performed in network byte order.";
+      "Indicates decrement modifier action.";
   }
 
   identity random {
     base modifier-action-type;
     description
-      "Indicates implementation-specific random modifier action.";
+      "Indicates random modifier action.";
   }
 
   grouping common-data {
@@ -484,7 +475,7 @@ module ietf-traffic-generator {
          '../testframe-type' for the corresponding
          dynamic fields or filled with zeros.
 
-         In the case of an Ethernet interface and static
+         In the case of an Ethernet inteface and static
          test frame the correct 4-octet FCS is added to
          the generated frames. The only way to generate
          frames with bad FCS is to specify the data
@@ -500,7 +491,7 @@ module ietf-traffic-generator {
          the closest stream that precedes it that is used.";
     }
     leaf gap {
-      type uint64;
+      type uint32;
       units "octets";
       mandatory true;
       description
@@ -547,10 +538,7 @@ module ietf-traffic-generator {
         key "id";
         description
           "Each modifier specifies the action to be performed
-           on data at a certain offset.
-
-           Overlapping modifiers have no ordering rules
-           and the behavior will be unspecified.";
+           on data at a certain offset.";
         leaf id {
           type uint32;
           description
@@ -606,14 +594,14 @@ module ietf-traffic-generator {
         }
         uses burst-data;
         leaf frames-per-stream {
-          type uint64;
+          type uint32;
           mandatory true;
           description
             "The count of frames to be generated before
              generation of the next stream is started.";
         }
         leaf stream-gap {
-          type uint64;
+          type uint32;
           units "octets";
           mandatory true;
           description
@@ -641,7 +629,6 @@ module ietf-traffic-generator {
           uses modifier-data;
         }
         case multi-stream {
-          if-feature "multi-stream";
           uses multi-stream-data;
         }
       }
@@ -696,9 +683,6 @@ module ietf-traffic-analyzer {
     "This module contains a collection of YANG definitions for
      management of the traffic analyzer functionality part
      of network interconnect testers.
-
-     The module is intended for use in a laboratory-isolated
-     environment.
 
      Copyright (c) 2026 IETF Trust and the persons identified as
      authors of the code.  All rights reserved.
@@ -796,12 +780,12 @@ module ietf-traffic-analyzer {
       leaf pkts {
         type yang:counter64;
         description
-          "Total count of packets analyzed.";
+          "Total number of packets analyzed.";
       }
       leaf octets {
         type yang:counter64;
         description
-          "Total count of octets analyzed.";
+          "Total number of packet octets analyzed.";
       }
       leaf idle-octets {
         if-feature "idle-octets-counter";
@@ -809,8 +793,8 @@ module ietf-traffic-analyzer {
         description
           "Total accumulated period with no frame transmission
            taking place measured in octets at the current link
-           speed. This counter increments whenever the interface
-           is not operating at 100% of its capacity.
+           speed. This counter does not increment only when the
+           interface is operating at 100% of its capacity.
 
            Octets not counted in '../octets' but not idle are,
            for example, layer 1 framing octets - for Ethernet interfaces
@@ -833,12 +817,7 @@ module ietf-traffic-analyzer {
       leaf pkts {
         type yang:counter64;
         description
-          "Total count of testframes.";
-      }
-      leaf octets {
-        type yang:counter64;
-        description
-          "Total count of testframe octets.";
+          "Total count of detected testframes.";
       }
       leaf sequence-errors {
         type yang:counter64;
@@ -927,7 +906,9 @@ module ietf-traffic-analyzer {
       leaf octets {
         type yang:counter64;
         description
-          "Total count of captured octets.";
+          "This counter is identical with the in-octets/out-octets
+           counters defined in RFC8343 except that it counts the
+           octets captured since the analyzer was created.";
       }
     }
   }
@@ -1202,7 +1183,7 @@ registry group.
     </section>
 <section title="Operational Considerations">
 <t>
-The configuration nodes defined in the "ietf-traffic-generator" YANG module allow deterministic specification of traffic as a sequences of frames each followed by a gap. Unless 'realtime-epoch' leaf is present the interface starts generation upon the creation or any change of the configuration under '/if:interfaces/if:interface/nttg:traffic-generator'. Multiple traffic generators on different interfaces can be synchronized with the 'start-delay' leaf. Traffic generation continues until as many frames as specified by the 'total-frames' leaf when it is present are generated or until the traffic generator generator configuration under the 'traffic-generator' container is deleted causing the traffic generation to stop or changed causing the traffic generation to stop then restart.
+The configuration nodes defined in the ietf-traffic-generator module allow deterministic specification of traffic as a sequences of frames each followed by a gap. Unless 'realtime-epoch' leaf is present the interface starts generation upon the creation or any change of the configuration under '/if:interfaces/if:interface/nttg:traffic-generator'. Multiple traffic generators on different interfaces can be synchronized with the 'start-delay' leaf. Traffic generation continues until as many frames as specified by the 'total-frames' leaf when it is present are generated or until the traffic generator generator configuration under the 'traffic-generator' container is deleted causing the traffic generation to stop or changed causing the traffic generation to stop then restart.
 </t>
 <t>
 The data model design requires transactional network management protocol that can replace one configuration with another in atomic operation. This is why NETCONF <xref target="RFC6241"/> is suitable and RESTCONF <xref target="RFC8040"/> is not without special mechanisms designed to emulate transactional protocol behavior.
@@ -1217,7 +1198,7 @@ The presence of '/if:interfaces/if:interface/ntta:traffic-analyzer' container de
 This section is modeled after the template described in Section 3.7.1
 of <xref target="RFC9907"/>.</t>
 <t>
-The YANG modules "ietf-traffic-generator" and "ietf-traffic-analyzer"
+The YANG modules “ietf-traffic-generator” and “ietf-traffic-analyzer”
 define a data model that is
 designed to be accessed via YANG-based transactional management protocols,
 such as the Network Configuration Protocol (NETCONF) <xref target="RFC6241"/>. These YANG-based management protocols
@@ -1244,21 +1225,7 @@ have particular sensitivities/vulnerabilities:
             </t>
             </section>
             <section title="ietf-traffic-analyzer.yang">
-            <t>
-There are a number of data nodes defined in this YANG module that are
-writable/creatable/deletable (i.e., "config true", which is the
-default).  All writable data nodes are likely to be sensitive or
-vulnerable in some network environments.  Write
-operations (e.g., edit-config) and delete operations to these data
-nodes without proper protection or authentication can have a negative
-effect on network operations.  The following subtrees and data nodes
-have particular sensitivities/vulnerabilities:
-                    <list style="symbols">
-                        <t>/if:interfaces/if:interface/ntta:traffic-analyzer/ntta:capture: This can be used for malicious purposes by enabling the packet capture feature
-on any interface, configuring filter rules to target specific traffic flows, and reading back the captured frames via the state tree.</t>
-                    </list>
-            </t>
-            <t>
+                <t>
 Some of the readable data nodes in this YANG module may be considered
 sensitive or vulnerable in some network environments.  It is thus
 important to control read access (e.g., via get, get-config, or
@@ -1362,7 +1329,7 @@ net.commit()
 before=net.get()
 
 # Start traffic
-net.node("tester0").edit(
+net.node("tester0).edit(
   "create /interfaces/interface[name='eth0']/traffic-generator -- "
   "frame-size=64 gap=20")
 
@@ -1371,7 +1338,7 @@ net.commit()
 time.sleep(60)
 
 # Stop traffic
-net.node("tester0").edit("delete /interfaces/interface[name='eth0']/"
+net.node("tester1").edit("delete /interfaces/interface[name='eth0']/"
                          "traffic-generator")
 net.commit()
 
@@ -1386,16 +1353,16 @@ received_pkts=delta("tester1",before,after,
   "/interfaces/interface[name='eth0']/statistics/in-unicast-pkts")
 
 analyzed_pkts=absolute("tester1",after,
-  "/interfaces/interface[name='eth0']/traffic-analyzer/state"
+  "/interfaces/interface[name='eth0']/traffic-analyzer/
   "statistics/pkts")
 
 latency_max=absolute(after,
   "/interfaces/interface[name='eth0']/traffic-analyzer/state/"
-  "testframe-statistics/latency/max")
+  "testframe-stats/latency/max")
 
 # Cleanup
 net.node("tester1").edit(
-   "delete /interfaces/interface[name='eth0']/traffic-analyzer")
+   "delete /interfaces/interface/traffic-analyzer")
 net.node("dut0").edit("delete /flows")
 net.node("dut0").edit("delete /interfaces")
 net.commit()

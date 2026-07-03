@@ -49,7 +49,7 @@ module ietf-traffic-analyzer {
      This version of this YANG module is part of RFC XXXX; see
      the RFC itself for full legal notices.";
 
-  revision 2026-06-24 {
+  revision 2026-06-26 {
     description
       "Initial revision.";
     reference
@@ -128,12 +128,12 @@ module ietf-traffic-analyzer {
       leaf pkts {
         type yang:counter64;
         description
-          "Total number of packets analyzed.";
+          "Total count of packets analyzed.";
       }
       leaf octets {
         type yang:counter64;
         description
-          "Total number of packet octets analyzed.";
+          "Total count of octets analyzed.";
       }
       leaf idle-octets {
         if-feature "idle-octets-counter";
@@ -141,8 +141,8 @@ module ietf-traffic-analyzer {
         description
           "Total accumulated period with no frame transmission
            taking place measured in octets at the current link
-           speed. This counter does not increment only when the
-           interface is operating at 100% of its capacity.
+           speed. This counter increments whenever the interface
+           is not operating at 100% of its capacity.
 
            Octets not counted in '../octets' but not idle are,
            for example, layer 1 framing octets - for Ethernet interfaces
@@ -165,7 +165,12 @@ module ietf-traffic-analyzer {
       leaf pkts {
         type yang:counter64;
         description
-          "Total count of detected testframes.";
+          "Total count of testframes.";
+      }
+      leaf octets {
+        type yang:counter64;
+        description
+          "Total count of testframe octets.";
       }
       leaf sequence-errors {
         type yang:counter64;
@@ -254,9 +259,7 @@ module ietf-traffic-analyzer {
       leaf octets {
         type yang:counter64;
         description
-          "This counter is identical with the in-octets/out-octets
-           counters defined in RFC8343 except that it counts the
-           octets captured since the analyzer was created.";
+          "Total count of captured octets.";
       }
     }
   }
@@ -461,12 +464,14 @@ module ietf-traffic-analyzer {
       "Logical AND of masked bit fields.";
     leaf mask {
       type binary;
+      mandatory true;
       description
         "Specifies bit field mask for comparison.
          Non-masked bit fields are ignored.";
     }
     leaf data {
       type binary;
+      mandatory true;
       description
         "Specify data to be matched according to the specified mask.";
     }
@@ -474,7 +479,7 @@ module ietf-traffic-analyzer {
       type uint32;
       mandatory true;
       description
-        "Offset in the frame.";
+        "Offset in the frame where 'mask' and 'data' are applied.";
     }
   }
 }

@@ -6,8 +6,8 @@ module: ietf-traffic-analyzer
        |  +--rw type?     identityref
        |  +--rw filter! {testframe-filter}?
        |     +--rw type      identityref
-       |     +--rw mask?     binary
-       |     +--rw data?     binary
+       |     +--rw mask      binary
+       |     +--rw data      binary
        |     +--rw offset    uint32
        +--rw capture! {capture}?
        |  +--rw max-frames-visible?       uint64
@@ -32,6 +32,7 @@ module: ietf-traffic-analyzer
           |  +--ro errors?        yang:counter64
           +--ro testframe-statistics
           |  +--ro pkts?                  yang:counter64
+          |  +--ro octets?                yang:counter64
           |  +--ro sequence-errors?       yang:counter64
           |  +--ro payload-errors?        yang:counter64
           |  +--ro latency
